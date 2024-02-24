@@ -1,0 +1,66 @@
+{
+    "table": [
+        {
+            "courseCode": "EE1102",
+            "courseName": "Basic Electrical Engineering",
+            "facultyName": "Yemula Pradeep Kumar",
+            "timePeriod": "10:00-10:55",
+            "roomNo": "LH-06",
+            "onCampus": "On Campus",
+            "attendanceDate": "21-02-2024",
+            "fromTime": "10:00",
+            "segment": "1-6",
+            "timeTableId": "6264DFF4-4B62-4C33-8169-0FBF30A63780",
+            "roomId": "LH-06",
+            "classGroup": "Completed",
+            "attendanceMarked": false,
+            "isAttendanceMarkApplicable": 0
+        },
+        {
+            "courseCode": "EE3800",
+            "courseName": "Information Theory",
+            "facultyName": "Lakshmi Prasad Natarajan",
+            "timePeriod": "11:00-11:55",
+            "roomNo": "",
+            "onCampus": "On Campus",
+            "attendanceDate": "21-02-2024",
+            "fromTime": "11:00",
+            "segment": "1-6",
+            "timeTableId": "C61FC913-738C-4FA8-BEB5-65FD9603F36D",
+            "roomId": "",
+            "classGroup": "Completed",
+            "attendanceMarked": true,
+            "isAttendanceMarkApplicable": 0
+        },
+        {
+            "courseCode": "EE6310",
+            "courseName": "Image and Video Processing",
+            "facultyName": "Sumohana S Channappayya",
+            "timePeriod": "14:30-15:25",
+            "roomNo": "",
+            "onCampus": "On Campus",
+            "attendanceDate": "21-02-2024",
+            "fromTime": "14:30",
+            "segment": "1-6",
+            "timeTableId": "1E0BA8FA-F631-4072-9714-2F425F8E4DF2",
+            "roomId": "",
+            "classGroup": "Ongoing",
+            "attendanceMarked": true,
+            "isAttendanceMarkApplicable": 1
+        }
+    ],
+    "table1": [
+        {
+            "timetableID": "3C7DEBFD-8920-478B-B76A-0F16CD356980",
+            "beaconUDID": "DC:0D:30:BD:31:FA",
+            "beaconMacID": "DC:0D:30:BD:31:FA",
+            "rangeDef": 75.0
+        },
+        {
+            "timetableID": "6264DFF4-4B62-4C33-8169-0FBF30A63780",
+            "beaconUDID": "DC:0D:30:BD:32:22",
+            "beaconMacID": "DC:0D:30:BD:32:22",
+            "rangeDef": 80.0
+        }
+    ]
+}
