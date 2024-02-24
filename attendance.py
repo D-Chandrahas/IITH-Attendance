@@ -3,7 +3,8 @@ import requests as req
 import json
 
 
-BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
+# BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
+BASE_URL = "http://127.0.0.1:5000/MobileAPI/"
 
 LOGIN_PATH = "GetMobileAppValidatePassword"
 
@@ -11,8 +12,10 @@ CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.j
 
 CONFIG = {}
 
+
 def cls():
-    os.system('cls' if os.name=='nt' else 'clear')
+    os.system("cls" if os.name=="nt" else "clear")
+
 
 def load_config():
     global CONFIG
@@ -24,13 +27,20 @@ def load_config():
         with open(CONFIG_PATH, "w") as f:
             json.dump(CONFIG, f)
 
+def modify_config(key, value):
+    global CONFIG
+    CONFIG[key] = value
+    with open(CONFIG_PATH, "w") as f:
+        json.dump(CONFIG, f)
+
+
 def login_req(userid, password):
     body = { # fixme all keys
         "UserID": userid,
         "Password": password
     }
     # ! headers
-    res = req.post(BASE_URL + LOGIN_PATH, data=body) # fixme body text spacing
+    res = req.post(BASE_URL + LOGIN_PATH, json=body) # fixme body text spacing
 
     if res.status_code == 200:
         success = True
@@ -43,26 +53,33 @@ def login_req(userid, password):
 
     return success, webid, error_msg
 
+
 def login_page():
     cls()
+
     userid = input("\nEnter User ID: ")
     
     password = input("\nEnter Password: ")
     
     success, webid, error_msg = login_req(userid, password)
 
-    CONFIG = {
-        "Webidentifier" : webid,
-    }
-    with open(CONFIG_PATH, "w") as f:
-        json.dump(CONFIG, f)
-
-    if not success:
+    if success:
+        modify_config("Webidentifier", webid)
+    else:
         print(f"\nError: {error_msg}")
         input("\nPress Enter to retry (or) Ctrl+C to exit")
 
+
+def logout():
+    modify_config("Webidentifier", None)
+
+
 def home_page(): # todo implement
-    pass
+    cls()
+    print("Home Page")
+    input("\nPress Enter to logout (or) Ctrl+C to exit")
+    logout()
+    
     
         
 def main():
@@ -73,10 +90,12 @@ def main():
             login_page()
         home_page()
 
+
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
+        cls()
         exit(0)
 
 
