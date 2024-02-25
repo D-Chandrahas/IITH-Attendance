@@ -8,6 +8,8 @@ import string
 BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
 
 LOGIN_PATH = "GetMobileAppValidatePassword"
+TIMETABLE_PATH = "GetStudentTimeTableForAttendance"
+MARK_ATTENDANCE_PATH = "UpSertStudentAttendanceDetails"
 
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
 
@@ -30,6 +32,7 @@ def load_config():
         with open(CONFIG_PATH, "w") as f:
             json.dump(CONFIG, f)
 
+
 def modify_config(key, value):
     global CONFIG
     CONFIG[key] = value
@@ -48,24 +51,16 @@ def login_req(userid, password):
     try:
         res = req.post(BASE_URL + LOGIN_PATH, json=body)
     except Exception as e:
-        return False, None, f"Error: {e}\nProbably a server-side error, IDK tho"
+        return False, f"{e}\nProbably a server-side error, IDK tho"
     
-    data = res.json()[0]
     if res.status_code == 200:
+        data = res.json()[0]
         if data["errorId"] == 0:
-            success = True
-            webid = data["referenceId"]
-            error_msg = None
+            return True, data["referenceId"]
         else:
-            success = False
-            webid = None
-            error_msg = data["errorMessage"]
+            return False, data["errorMessage"]
     else:
-        success = False
-        webid = None
-        error_msg = f"Http Status {res.status_code}\n{res.text}"
-
-    return success, webid, error_msg
+        return False, f"Http Status {res.status_code}\n{res.text}"
 
 
 def login_page():
@@ -74,25 +69,131 @@ def login_page():
     userid = input("\nEnter User ID: ")
     
     password = input("\nEnter Password: ")
+
+    print("\nLogging in...")
     
-    success, webid, error_msg = login_req(userid, password)
+    success, data = login_req(userid, password)
 
     if success:
-        modify_config("WebIdentifier", webid)
+        modify_config("WebIdentifier", data)
     else:
-        print(f"\nError: {error_msg}")
-        input("\nPress Enter to retry (or) Ctrl+C to exit")
+        print("\nError:", data)
+        input("\nEnter to retry (or) Ctrl+C to exit")
 
 
 def logout():
     modify_config("WebIdentifier", None)
 
 
+def timetable_req():
+    body = { "WebIdentifier": CONFIG["WebIdentifier"] }
+
+    try:
+        res = req.post(BASE_URL + TIMETABLE_PATH, json=body)
+    except Exception as e:
+        return False, f"{e}\nProbably a server-side error, IDK"
+    
+    if res.status_code == 200:
+        return True, res.json()["table"]
+    else:
+        return False, f"Http Status {res.status_code}\n{res.text}"
+
+
+def print_timetable(timetable):
+    if len(timetable) == 0:
+        print("No classes today!")
+        return
+    else:
+        idx = 1
+        for course in timetable:
+            print(f"{idx})",
+                    course["courseCode"],
+                    course["courseName"],
+                    course["timePeriod"],
+                    course["classGroup"],
+                    course["attendanceMarked"])
+            idx += 1
+
+
+def get_ongoing_not_marked_courses(timetable):
+    ongoing_not_marked = []
+    idx = 1
+    for course in timetable:
+        if course["isAttendanceMarkApplicable"] == 1 and not course["attendanceMarked"]:
+            ongoing_not_marked.append(idx)
+        idx += 1
+    return ongoing_not_marked
+
+
+def mark_attendance(timeTableId):
+    body = {
+        "Webidentifier": CONFIG["WebIdentifier"],
+        "TimeTableId": timeTableId
+    }
+
+    try:
+        res = req.post(BASE_URL + MARK_ATTENDANCE_PATH, json=body)
+    except Exception as e:
+        return False, f"{e}\nProbably a server-side error, IDK"
+    
+    if res.status_code == 200:
+        data = res.json()[0] # !
+        if data["errorId"] == 0: # !
+            return True, None
+        else:
+            return False, data["errorMessage"] # !
+    else:
+        return False, f"Http Status {res.status_code}\n{res.text}"
+
+
+
 def home_page(): # todo implement
-    cls()
-    print("Home Page")
-    input("\nPress Enter to logout (or) Ctrl+C to exit")
-    logout()
+    while True:
+        cls()
+        print("Fetching timetable...")
+        success1, data = timetable_req()
+
+        if not success1:
+            cls()
+            print("\nCtrl+C: Exit\n0)Lougout\n")
+            print("\nUnable to fetch timetable.", "\n\nError:", data)
+            opt = input("\nChoose from above options (or) Enter to retry: ")
+            if opt == "0":
+                logout()
+                return
+        else:
+            while True:
+                cls()
+                print("\nCtrl+C: Exit\n0)Lougout\n")
+                print_timetable(data)
+                ongoing_not_marked = get_ongoing_not_marked_courses(data)
+                opt = input("\nChoose from above options (or) Enter to refresh: ")
+                if opt == "":
+                    break
+                elif opt == "0":
+                    logout()
+                    return
+                else:
+                    try:
+                        opt = int(opt)
+                    except Exception:
+                        input("\nInvalid option. Press Enter to retry")
+                        continue
+
+                    if opt not in ongoing_not_marked:
+                        input("\nInvalid option. Press Enter to retry")
+                        continue
+                    else:
+                        print("\nMarking attendance...")
+                        success2, err_msg = mark_attendance(data[opt-1]["timeTableId"])
+                        if success2:
+                            input(f"Attendance marked for {data[opt-1]['courseCode']}. Enter to continue")
+                            break
+                        else:
+                            input(f"Error: {err_msg}.\nEnter to retry")
+                            break
+    
+
     
     
         
