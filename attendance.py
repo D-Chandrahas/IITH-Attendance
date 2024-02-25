@@ -1,6 +1,8 @@
 import os
+from random import choices
 import requests as req
 import json
+import string
 
 
 BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
@@ -11,8 +13,8 @@ CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.j
 
 CONFIG = {}
 
-FAKE_FCMID = "WQaNTlvZNsk22L-3LmDu7Y:W4cKL23YQsnIkyfgk4QQ5uGotc-U6K40QO6ydXeou8eGLHtj3VZRJ2ixbJSYcqbN59vnz7TvVVpYfa5i95o0X2aa8kxv0lQ1RyBkpsqmz9YNWRpNh3fJ5u0t7ZtuX4Mm9FKdQGdt2V2W,OS:33,Model:SM-M325F,BRAND:samsung,MANUFACTURER:samsung,Build ID:RSR1.210722.013"
-
+temp = ''.join(choices(string.ascii_letters + string.digits, k=160))
+FAKE_FCMID = f"{temp[:14]}-{temp[14:21]}:{temp[21:47]}-{temp[47:160]}" + ",OS:33,Model:SM-M325F,BRAND:microsoft,MANUFACTURER:microsoft,Build ID:RSR1.210722.013"
 
 def cls():
     os.system("cls" if os.name=="nt" else "clear")
