@@ -109,18 +109,14 @@ def timetable_req():
 
 
 def print_timetable(timetable):
-    if len(timetable) == 0:
-        print("No classes today!")
-        return
-    else:
-        idx = 1
-        print("_"*97)
-        print(f'| S.No | Course Code | {"Course Name":^30} | Time Period | Class Status | Attendance |')
-        print(f'|{"-"*6}|{"-"*13}|{"-"*32}|{"-"*13}|{"-"*14}|{"-"*12}|')
-        for course in timetable:
-            print(f'| {str(idx)+".":^4} | {course["courseCode"]:^11} | {course["courseName"][:30]:^30} | {course["timePeriod"]} | {course["classGroup"]:^12} | {course["attendanceMarked"]!s:^10} |')
-            idx += 1
-        print(f'|{"_"*6}|{"_"*13}|{"_"*32}|{"_"*13}|{"_"*14}|{"_"*12}|')
+    idx = 1
+    print("_"*97)
+    print(f'| S.No | Course Code | {"Course Name":^30} | Time Period | Class Status | Attendance |')
+    print(f'|{"-"*6}|{"-"*13}|{"-"*32}|{"-"*13}|{"-"*14}|{"-"*12}|')
+    for course in timetable:
+        print(f'| {str(idx)+".":^4} | {course["courseCode"]:^11} | {course["courseName"][:30]:^30} | {course["timePeriod"]} | {course["classGroup"]:^12} | {course["attendanceMarked"]!s:^10} |')
+        idx += 1
+    print(f'|{"_"*6}|{"_"*13}|{"_"*32}|{"_"*13}|{"_"*14}|{"_"*12}|')
 
 
 def get_not_marked_courses(timetable):
@@ -171,12 +167,13 @@ def home_page():
                 logout()
                 return
         else:
+            data = sorted(data, key=lambda x: int(x["timePeriod"][:2]))
+            not_marked = get_not_marked_courses(data)
             while True:
                 cls()
                 print(f"\nWelcome, {CONFIG['Name']}\n")
                 print("\nCtrl+C: Exit\n     0: Logout\n")
                 print_timetable(data)
-                not_marked = get_not_marked_courses(data)
                 opt = input("\nChoose from above options (or) Enter to refresh: ")
                 if opt == "":
                     break
@@ -220,4 +217,9 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         cls()
         exit(0)
+    except Exception as e:
+        cls()
+        print("\nError: ", e)
+        print("\nNote: This program was only tested on Python 3.10")
+        exit(1)
 
