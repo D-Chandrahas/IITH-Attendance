@@ -164,3 +164,6 @@ config.json
 
 # t0d0 file
 todo.txt
+
+# error test server
+/app.py
