@@ -5,8 +5,8 @@ import json
 import string
 
 
-# BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
-BASE_URL = "http://127.0.0.1:5000/MobileAPI/"
+BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
+# BASE_URL = "http://127.0.0.1:5000/MobileAPI/"
 
 LOGIN_PATH = "GetMobileAppValidatePassword"
 TIMETABLE_PATH = "GetStudentTimeTableForAttendance"
@@ -19,8 +19,9 @@ CONFIG = {}
 temp = ''.join(choices(string.ascii_letters + string.digits, k=160))
 FAKE_FCMID = f"{temp[:14]}-{temp[14:21]}:{temp[21:47]}-{temp[47:160]}" + ",OS:33,Model:SM-M325F,BRAND:microsoft,MANUFACTURER:microsoft,Build ID:RSR1.210722.013"
 
+CLSCR_SYSCALL = "cls" if os.name=="nt" else "clear"
 def cls():
-    os.system("cls" if os.name=="nt" else "clear")
+    os.system(CLSCR_SYSCALL)
 
 
 def load_config():
@@ -212,6 +213,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         cls()
         exit(0)
-
-
 
