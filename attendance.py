@@ -31,6 +31,7 @@ def load_config():
             CONFIG = json.load(f)
     else:
         CONFIG["WebIdentifier"] = None
+        CONFIG["Name"] = None
         with open(CONFIG_PATH, "w") as f:
             json.dump(CONFIG, f)
 
@@ -38,6 +39,8 @@ def load_config():
 def modify_config(key, value):
     global CONFIG
     CONFIG[key] = value
+
+def save_config():
     with open(CONFIG_PATH, "w") as f:
         json.dump(CONFIG, f)
 
@@ -58,11 +61,11 @@ def login_req(userid, password):
     if res.status_code == 200:
         data = res.json()[0]
         if data["errorId"] == 0:
-            return True, data["referenceId"]
+            return True, data["referenceId"], data["studentName"]
         else:
-            return False, data["errorMessage"] + "\n"
+            return False, data["errorMessage"] + "\n", None
     else:
-        return False, f"Http Status {res.status_code}\n{res.text}"
+        return False, f"Http Status {res.status_code}\n{res.text}", None
 
 
 def login_page():
@@ -74,10 +77,12 @@ def login_page():
 
     print("\nLogging in...\n")
     
-    success, data = login_req(userid, password)
+    success, data, name = login_req(userid, password)
 
     if success:
         modify_config("WebIdentifier", data)
+        modify_config("Name", name)
+        save_config()
     else:
         print("Error:", data)
         input("Enter to retry (or) Ctrl+C to exit")
@@ -85,6 +90,8 @@ def login_page():
 
 def logout():
     modify_config("WebIdentifier", None)
+    modify_config("Name", None)
+    save_config()
 
 
 def timetable_req():
@@ -107,11 +114,13 @@ def print_timetable(timetable):
         return
     else:
         idx = 1
+        print("_"*97)
         print(f'| S.No | Course Code | {"Course Name":^30} | Time Period | Class Status | Attendance |')
         print(f'|{"-"*6}|{"-"*13}|{"-"*32}|{"-"*13}|{"-"*14}|{"-"*12}|')
         for course in timetable:
             print(f'| {str(idx)+".":^4} | {course["courseCode"]:^11} | {course["courseName"][:30]:^30} | {course["timePeriod"]} | {course["classGroup"]:^12} | {course["attendanceMarked"]!s:^10} |')
             idx += 1
+        print(f'|{"_"*6}|{"_"*13}|{"_"*32}|{"_"*13}|{"_"*14}|{"_"*12}|')
 
 
 def get_not_marked_courses(timetable):
@@ -154,6 +163,7 @@ def home_page():
 
         if not success1:
             cls()
+            print(f"\nWelcome, {CONFIG['Name']}\n")
             print("\nCtrl+C: Exit\n     0: Logout\n")
             print("\nUnable to fetch timetable.", "\n\nError:", data)
             opt = input("Choose from above options (or) Enter to retry: ")
@@ -163,6 +173,7 @@ def home_page():
         else:
             while True:
                 cls()
+                print(f"\nWelcome, {CONFIG['Name']}\n")
                 print("\nCtrl+C: Exit\n     0: Logout\n")
                 print_timetable(data)
                 not_marked = get_not_marked_courses(data)
