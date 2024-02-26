@@ -5,7 +5,8 @@ import json
 import string
 
 
-BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
+# BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
+BASE_URL = "http://127.0.0.1:5000/MobileAPI/"
 
 LOGIN_PATH = "GetMobileAppValidatePassword"
 TIMETABLE_PATH = "GetStudentTimeTableForAttendance"
@@ -51,14 +52,14 @@ def login_req(userid, password):
     try:
         res = req.post(BASE_URL + LOGIN_PATH, json=body)
     except Exception as e:
-        return False, f"{e}\nProbably a server-side error, IDK tho"
+        return False, f"{e}\nProbably a server-side error, IDK tho\n"
     
     if res.status_code == 200:
         data = res.json()[0]
         if data["errorId"] == 0:
             return True, data["referenceId"]
         else:
-            return False, data["errorMessage"]
+            return False, data["errorMessage"] + "\n"
     else:
         return False, f"Http Status {res.status_code}\n{res.text}"
 
@@ -70,15 +71,15 @@ def login_page():
     
     password = input("\nEnter Password: ")
 
-    print("\nLogging in...")
+    print("\nLogging in...\n")
     
     success, data = login_req(userid, password)
 
     if success:
         modify_config("WebIdentifier", data)
     else:
-        print("\nError:", data)
-        input("\nEnter to retry (or) Ctrl+C to exit")
+        print("Error:", data)
+        input("Enter to retry (or) Ctrl+C to exit")
 
 
 def logout():
@@ -91,7 +92,7 @@ def timetable_req():
     try:
         res = req.post(BASE_URL + TIMETABLE_PATH, json=body)
     except Exception as e:
-        return False, f"{e}\nProbably a server-side error, IDK"
+        return False, f"{e}\nProbably a server-side error, IDK\n"
     
     if res.status_code == 200:
         return True, res.json()["table"]
@@ -111,18 +112,19 @@ def print_timetable(timetable):
                     course["courseName"],
                     course["timePeriod"],
                     course["classGroup"],
-                    course["attendanceMarked"])
+                    course["attendanceMarked"],
+                    sep=", ")
             idx += 1
 
 
-def get_ongoing_not_marked_courses(timetable):
-    ongoing_not_marked = []
+def get_not_marked_courses(timetable):
+    not_marked = []
     idx = 1
     for course in timetable:
-        if course["isAttendanceMarkApplicable"] == 1 and not course["attendanceMarked"]:
-            ongoing_not_marked.append(idx)
+        if not course["attendanceMarked"]:
+            not_marked.append(idx)
         idx += 1
-    return ongoing_not_marked
+    return not_marked
 
 
 def mark_attendance(timeTableId):
@@ -134,20 +136,20 @@ def mark_attendance(timeTableId):
     try:
         res = req.post(BASE_URL + MARK_ATTENDANCE_PATH, json=body)
     except Exception as e:
-        return False, f"{e}\nProbably a server-side error, IDK"
+        return False, f"{e}\nProbably a server-side error, IDK\n"
     
     if res.status_code == 200:
-        data = res.json()[0] # !
-        if data["errorId"] == 0: # !
+        data = res.json()["table"][0]
+        if data["errorid"] == 0:
             return True, None
         else:
-            return False, data["errorMessage"] # !
+            return False, data["errormessage"] + "\n"
     else:
         return False, f"Http Status {res.status_code}\n{res.text}"
 
 
 
-def home_page(): # todo implement
+def home_page():
     while True:
         cls()
         print("Fetching timetable...")
@@ -157,7 +159,7 @@ def home_page(): # todo implement
             cls()
             print("\nCtrl+C: Exit\n0)Lougout\n")
             print("\nUnable to fetch timetable.", "\n\nError:", data)
-            opt = input("\nChoose from above options (or) Enter to retry: ")
+            opt = input("Choose from above options (or) Enter to retry: ")
             if opt == "0":
                 logout()
                 return
@@ -166,7 +168,7 @@ def home_page(): # todo implement
                 cls()
                 print("\nCtrl+C: Exit\n0)Lougout\n")
                 print_timetable(data)
-                ongoing_not_marked = get_ongoing_not_marked_courses(data)
+                not_marked = get_not_marked_courses(data)
                 opt = input("\nChoose from above options (or) Enter to refresh: ")
                 if opt == "":
                     break
@@ -180,20 +182,18 @@ def home_page(): # todo implement
                         input("\nInvalid option. Press Enter to retry")
                         continue
 
-                    if opt not in ongoing_not_marked:
+                    if opt not in not_marked:
                         input("\nInvalid option. Press Enter to retry")
                         continue
                     else:
-                        print("\nMarking attendance...")
+                        print("\nMarking attendance...\n")
                         success2, err_msg = mark_attendance(data[opt-1]["timeTableId"])
                         if success2:
                             input(f"Attendance marked for {data[opt-1]['courseCode']}. Enter to continue")
                             break
                         else:
-                            input(f"Error: {err_msg}.\nEnter to retry")
+                            input(f"Error: {err_msg}\nEnter to retry")
                             break
-    
-
     
     
         
