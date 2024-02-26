@@ -107,14 +107,10 @@ def print_timetable(timetable):
         return
     else:
         idx = 1
+        print(f'| S.No | Course Code | {"Course Name":^30} | Time Period | Class Status | Attendance |')
+        print(f'|{"-"*6}|{"-"*13}|{"-"*32}|{"-"*13}|{"-"*14}|{"-"*12}|')
         for course in timetable:
-            print(f"{idx})",
-                    course["courseCode"],
-                    course["courseName"],
-                    course["timePeriod"],
-                    course["classGroup"],
-                    course["attendanceMarked"],
-                    sep=", ")
+            print(f'| {str(idx)+".":^4} | {course["courseCode"]:^11} | {course["courseName"][:30]:^30} | {course["timePeriod"]} | {course["classGroup"]:^12} | {course["attendanceMarked"]!s:^10} |')
             idx += 1
 
 
@@ -158,7 +154,7 @@ def home_page():
 
         if not success1:
             cls()
-            print("\nCtrl+C: Exit\n0)Lougout\n")
+            print("\nCtrl+C: Exit\n     0: Logout\n")
             print("\nUnable to fetch timetable.", "\n\nError:", data)
             opt = input("Choose from above options (or) Enter to retry: ")
             if opt == "0":
@@ -167,7 +163,7 @@ def home_page():
         else:
             while True:
                 cls()
-                print("\nCtrl+C: Exit\n0)Lougout\n")
+                print("\nCtrl+C: Exit\n     0: Logout\n")
                 print_timetable(data)
                 not_marked = get_not_marked_courses(data)
                 opt = input("\nChoose from above options (or) Enter to refresh: ")
