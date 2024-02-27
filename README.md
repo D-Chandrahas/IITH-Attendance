@@ -15,8 +15,12 @@
 - Run the script using `python attendance.py`.
     - The script creates a `config.json` file in the same folder as the script.
         - This file stores your credentials.
-- **Note:** The program was tested with `python 3.10`, `requests==2.31.0` on windows 10.
-    - It should work on other versions of python and requests but I can't guarantee it.
 
 # Screenshots
 ![Screenshot1](/assets/img1.png)
+
+# Notes
+- The program was tested with `python 3.10`, `requests==2.31.0` on windows 10.
+    - It should work on other versions of python and requests but I can't guarantee it.
+- Only **one** user can be logged in at a time (per script file).
+    - You can make multiple copies of the script and login as different user in each copy **but** make sure to place them in **different folders**.
