@@ -1,9 +1,10 @@
-import os
-from random import choices
-import requests as req
 import json
+import os
 import string
+import sys
+from random import choices
 
+import requests as req
 
 BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
 # BASE_URL = "http://127.0.0.1:5000/MobileAPI/"
@@ -12,7 +13,11 @@ LOGIN_PATH = "GetMobileAppValidatePassword"
 TIMETABLE_PATH = "GetStudentTimeTableForAttendance"
 MARK_ATTENDANCE_PATH = "UpSertStudentAttendanceDetails"
 
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+if len(sys.argv) > 1:
+    CONFIG_PATH = sys.argv[1]
+else:
+    CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+
 
 CONFIG = {}
 

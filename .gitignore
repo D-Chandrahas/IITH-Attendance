@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 # local app config file
-config.json
+config*.json
 
 # t0d0 file
 todo.txt

@@ -19,12 +19,28 @@
 # Screenshots
 ![Screenshot1](/assets/img1.png)
 
+# Advanced usage
+```
+usage: python attendance.py [filepath]
+
+optional arguments:
+    filepath                Path to the config file. If it doesn't exist, it will be created.
+```
+### Examples:
+```
+python attendance.py 'C:\Users\<user>\Documents\config1.json'
+python attendance.py '~\Desktop\settings2.json'
+python attendance.py '.\file3.json'
+```
+
 # Notes
 - The program was tested with `python 3.10`, `requests==2.31.0` on windows 10.
     - It should work on other versions of python and requests but I can't guarantee it.
-- Only **one** user can be logged in at a time (per script file).
-    - You can make multiple copies of the script and login as different user in each copy **but** make sure to place them in **different folders**.
+- Only **one** user can be logged in at a time (**per config file**).
+    - To use multiple accounts, create multiple config files.
+        - Refer to [Advanced usage](#advanced-usage) for details.
 
 # Troubleshooting
 - If you encounter any issues, try deleting the `config.json` file and running the script again.
+    - If the issue persists, open an issue on github with steps to reproduce the issue.
     
