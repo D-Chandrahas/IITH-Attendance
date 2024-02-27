@@ -220,6 +220,6 @@ if __name__ == "__main__":
     except Exception as e:
         cls()
         print("\nError: ", e)
-        print("\nNote: This program was only tested on Python 3.10")
+        print("\nTry deleting config file.\nNote: This program was only tested on Python 3.10")
         exit(1)
 
