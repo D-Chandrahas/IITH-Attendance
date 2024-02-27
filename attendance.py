@@ -17,23 +17,11 @@ CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.j
 CONFIG = {}
 
 temp = ''.join(choices(string.ascii_letters + string.digits, k=160))
-FAKE_FCMID = f"{temp[:14]}-{temp[14:21]}:{temp[21:47]}-{temp[47:160]}" + ",OS:33,Model:SM-M325F,BRAND:microsoft,MANUFACTURER:microsoft,Build ID:RSR1.210722.013"
+FAKE_FCMID = f"{temp[:14]}-{temp[14:21]}:{temp[21:47]}-{temp[47:160]}" + ",OS:33,Model:SM-M325F,BRAND:samsung,MANUFACTURER:samsung,Build ID:TP1A.220624.014"
 
 CLSCR_SYSCALL = "cls" if os.name=="nt" else "clear"
 def cls():
     os.system(CLSCR_SYSCALL)
-
-
-def load_config():
-    global CONFIG
-    if os.path.exists(CONFIG_PATH):
-        with open(CONFIG_PATH, "r") as f:
-            CONFIG = json.load(f)
-    else:
-        CONFIG["WebIdentifier"] = None
-        CONFIG["Name"] = None
-        with open(CONFIG_PATH, "w") as f:
-            json.dump(CONFIG, f)
 
 
 def modify_config(key, value):
@@ -45,11 +33,23 @@ def save_config():
         json.dump(CONFIG, f)
 
 
+def load_config():
+    global CONFIG
+    if os.path.exists(CONFIG_PATH):
+        with open(CONFIG_PATH, "r") as f:
+            CONFIG = json.load(f)
+    else:
+        modify_config("WebIdentifier", None)
+        modify_config("Name", None)
+        modify_config("FCMID", FAKE_FCMID)
+        save_config()
+
+
 def login_req(userid, password):
     body = {
         "UserID": userid,
         "DeviceType": "android",
-        "FCMID" : FAKE_FCMID,
+        "FCMID" : CONFIG["FCMID"],
         "Password": password
     }
 
