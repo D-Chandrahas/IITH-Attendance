@@ -24,3 +24,7 @@
     - It should work on other versions of python and requests but I can't guarantee it.
 - Only **one** user can be logged in at a time (per script file).
     - You can make multiple copies of the script and login as different user in each copy **but** make sure to place them in **different folders**.
+
+# Troubleshooting
+- If you encounter any issues, try deleting the `config.json` file and running the script again.
+    
