@@ -16,8 +16,6 @@ CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.j
 
 CONFIG = {}
 
-temp = ''.join(choices(string.ascii_letters + string.digits, k=160))
-FAKE_FCMID = f"{temp[:14]}-{temp[14:21]}:{temp[21:47]}-{temp[47:160]}" + ",OS:33,Model:SM-M325F,BRAND:samsung,MANUFACTURER:samsung,Build ID:TP1A.220624.014"
 
 CLSCR_SYSCALL = "cls" if os.name=="nt" else "clear"
 def cls():
@@ -41,7 +39,9 @@ def load_config():
     else:
         modify_config("WebIdentifier", None)
         modify_config("Name", None)
-        modify_config("FCMID", FAKE_FCMID)
+        temp = ''.join(choices(string.ascii_letters + string.digits, k=160))
+        fake_fcmid = f"{temp[:14]}-{temp[14:21]}:{temp[21:47]}-{temp[47:160]}" + ",OS:33,Model:SM-M325F,BRAND:samsung,MANUFACTURER:samsung,Build ID:TP1A.220624.014"
+        modify_config("FCMID", fake_fcmid)
         save_config()
 
 
