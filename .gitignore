@@ -167,3 +167,6 @@ todo.txt
 
 # error test server
 /app.py
+
+# debug config
+/.vscode
