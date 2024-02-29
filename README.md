@@ -15,6 +15,8 @@
 - Run the script using `python attendance.py`.
     - The script creates a `config.json` file in the same folder as the script.
         - This file stores your credentials.
+- Enter your username and password to login.
+    - Enter `S.No` of the class you want to mark attendance for.
 
 # Screenshots
 ![Screenshot1](/assets/img1.png)
