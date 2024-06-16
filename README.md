@@ -31,7 +31,6 @@ optional arguments:
 ### Examples:
 ```
 python attendance.py 'C:\Users\<user>\Documents\config1.json'
-python attendance.py '~\Desktop\settings2.json'
 python attendance.py '.\file3.json'
 ```
 
