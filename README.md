@@ -1,5 +1,5 @@
-### This is a simple alternative for the iith attandance app. It uses the same api as the official app and hence, is indistinguishable to the server. *
-\* Not guaranteed. I am **not** responsible for any consequences of using this script. Use at your own risk.
+### This is a simple alternative for the iith attandance app. It uses the same api endpoint as the official app. *
+\* I am **not** responsible for any consequences of using this script. Use at your own risk.
 
 # Features
 - You can mark attendance from anywhere.
