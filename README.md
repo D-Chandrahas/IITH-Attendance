@@ -4,9 +4,9 @@
 # Features
 - You can mark attendance from anywhere.
 - No facial recognition, location checking etc.
-- Attendance can be marked before the class starts or after the class ends.
-    - However, this is not recommended since the erp server probably logs requests including time of request.
-        - Although, I don't think anyone would check logs of thousands of students and requests per day.
+- ~~Attendance can be marked before the class starts or after the class ends.~~
+    - This feature is no longer available as time-of-request check is added on the server side.
+
 
 # Usage
 - Make sure you have `requests` installed.
