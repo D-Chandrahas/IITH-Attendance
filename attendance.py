@@ -3,8 +3,7 @@ import os
 import string
 import sys
 from random import choices
-
-import requests as req
+from requests import Session
 
 BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
 # BASE_URL = "http://127.0.0.1:5000/MobileAPI/"
@@ -12,6 +11,8 @@ BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
 LOGIN_PATH = "GetMobileAppValidatePassword"
 TIMETABLE_PATH = "GetStudentTimeTableForAttendance"
 MARK_ATTENDANCE_PATH = "UpSertStudentAttendanceDetails"
+
+req = Session()
 
 if len(sys.argv) > 1:
     CONFIG_PATH = sys.argv[1]
