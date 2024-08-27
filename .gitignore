@@ -161,12 +161,14 @@ cython_debug/
 
 # local app config file
 config*.json
+test*.json
 
 # t0d0 file
 todo.txt
 
-# error test server
+# test scripts
 /app.py
+test*.py
 
 # debug config
 /.vscode
