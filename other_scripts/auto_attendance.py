@@ -3,7 +3,7 @@ import os
 import string
 import sys
 from random import choices
-from requests import Session
+import requests as req
 from apscheduler.schedulers.blocking import BlockingScheduler as Scheduler
 
 BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
@@ -13,7 +13,6 @@ LOGIN_PATH = "GetMobileAppValidatePassword"
 TIMETABLE_PATH = "GetStudentTimeTableForAttendance"
 MARK_ATTENDANCE_PATH = "UpSertStudentAttendanceDetails"
 
-req = Session()
 
 if len(sys.argv) > 1:
     CONFIG_PATH = sys.argv[1]
@@ -168,7 +167,6 @@ def home_page():
         data = sorted(data, key=lambda x: int(x["timePeriod"][:2]))
         not_marked = get_not_marked_courses(data)
         print_timetable(data)
-        print("\nMarking attendance...\n")
         for i in not_marked:
             if data[i-1]["classGroup"] == "Ongoing":
                 success2, err_msg = mark_attendance(data[i-1]["timeTableId"])
