@@ -125,16 +125,6 @@ def print_timetable(timetable):
     print(f'|{"_"*6}|{"_"*13}|{"_"*32}|{"_"*13}|{"_"*14}|{"_"*12}|')
 
 
-def get_not_marked_courses(timetable):
-    not_marked = []
-    idx = 1
-    for course in timetable:
-        if not course["attendanceMarked"]:
-            not_marked.append(idx)
-        idx += 1
-    return not_marked
-
-
 def mark_attendance(timeTableId):
     body = {
         "Webidentifier": CONFIG["WebIdentifier"],
@@ -174,7 +164,6 @@ def home_page():
                 return
         else:
             data = sorted(data, key=lambda x: int(x["timePeriod"][:2]))
-            not_marked = get_not_marked_courses(data)
             while True:
                 cls()
                 print(f"\nWelcome, {CONFIG['Name']}\n")
@@ -190,11 +179,14 @@ def home_page():
                     try:
                         opt = int(opt)
                     except Exception:
-                        input("\nInvalid option. Press Enter to retry")
+                        input("\nError: Invalid option. Press Enter to retry")
                         continue
 
-                    if opt not in not_marked:
-                        input("\nInvalid option. Press Enter to retry")
+                    if opt < 1 or opt > len(data):
+                        input("\nError: Invalid option. Press Enter to retry")
+                        continue
+                    elif data[opt-1]["classGroup"] != "Ongoing" or data[opt-1]["attendanceMarked"]:
+                        input("\nError: Attendance already marked or Class not ongoing. Enter to continue")
                         continue
                     else:
                         print("\nMarking attendance...\n")
