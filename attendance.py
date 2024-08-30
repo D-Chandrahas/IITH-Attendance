@@ -67,11 +67,11 @@ def login_req(userid, password):
     if res.status_code == 200:
         data = res.json()[0]
         if data["errorId"] == 0:
-            return True, data["referenceId"], data["studentName"]
+            return True, (data["referenceId"], data["studentName"])
         else:
-            return False, data["errorMessage"] + "\n", None
+            return False, data["errorMessage"] + "\n"
     else:
-        return False, f"Http Status {res.status_code}\n{res.text}", None
+        return False, f"Http Status {res.status_code}\n{res.text}"
 
 
 def login_page():
@@ -83,11 +83,11 @@ def login_page():
 
     print("\nLogging in...\n")
     
-    success, data, name = login_req(userid, password)
+    success, data = login_req(userid, password)
 
     if success:
-        modify_config("WebIdentifier", data)
-        modify_config("Name", name)
+        modify_config("WebIdentifier", data[0])
+        modify_config("Name", data[1])
         save_config()
     else:
         print("Error:", data)
