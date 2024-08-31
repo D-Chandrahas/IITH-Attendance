@@ -30,12 +30,24 @@ def login_req():
             return False, data["errorMessage"]
     else:
         return False, f"Http Status {res.status_code}, {res.text}"
+
+
+def print_help():
+    print("\nUsage:\n    python config_gen.py [-h | --help]; Display this help page", file=sys.stderr)
+    print("    python config_gen.py [rollno1,password1] [rollno2,password2] ...", file=sys.stderr)
+    print("    python config_gen.py [file_path]\n", file=sys.stderr)
+    print("Input file format:\nrollno1,password1\nrollno2,password2\n...\n", file=sys.stderr)
+    
     
 if __name__ == "__main__":
     argc = len(sys.argv)
     if argc > 1:
+
+        if sys.argv[1] == "-h" or sys.argv[1] == "--help":
+            print_help()
+            exit(0)
         
-        if os.path.exists(sys.argv[1]):
+        elif os.path.exists(sys.argv[1]):
             with open(sys.argv[1], "r") as f:
                 user_creds = f.read().splitlines()
 
@@ -46,7 +58,7 @@ if __name__ == "__main__":
 
         for user_cred in user_creds:
 
-            BODY["UserID"], BODY["Password"] = user_cred.split(",")
+            BODY["UserID"], BODY["Password"] = map(str.strip, user_cred.split(","))
 
             success, data = login_req()
             
@@ -55,3 +67,5 @@ if __name__ == "__main__":
 
             else:
                 print("Error:", data, BODY["UserID"], BODY["Password"], file=sys.stderr)
+    else:
+        print_help()

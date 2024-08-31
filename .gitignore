@@ -159,16 +159,15 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# local app config file
-config*.json
-test*.json
+# test & config files
+config*.*
+test*.*
 
 # t0d0 file
 todo.txt
 
 # test scripts
 /app.py
-test*.py
 
 # debug config
 /.vscode

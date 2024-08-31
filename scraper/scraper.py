@@ -68,11 +68,22 @@ def get_user_creds():
                         break
 
 
+def print_help():
+    print("\nUsage:\n    python scraper.py [-h | --help]; Display this help page", file=sys.stderr)
+    print("    python scraper.py [rollno1] [rollno2] ...", file=sys.stderr)
+    print("    python scraper.py [file_path]\n", file=sys.stderr)
+    print("Input file format:\nrollno1\nrollno2\n...\n", file=sys.stderr)
+
+
 if __name__ == "__main__":
     argc = len(sys.argv)
     if argc > 1:
+        
+        if sys.argv[1] == "-h" or sys.argv[1] == "--help":
+            print_help()
+            exit(0)
 
-        if os.path.exists(sys.argv[1]):
+        elif os.path.exists(sys.argv[1]):
             with open(sys.argv[1], "r") as f:
                 user_ids = f.read().splitlines()
 
@@ -82,7 +93,7 @@ if __name__ == "__main__":
                 print(f"Error: No file found with path {sys.argv[1]}, treating it as rollno.", file=sys.stderr)
 
         for user_id in user_ids:
-            BODY["UserID"] = user_id
+            BODY["UserID"] = user_id.strip()
             
             if (creds := get_user_pwd()) is None:
                 print(f"Error: No student found with rollno. {user_id}", file=sys.stderr)
