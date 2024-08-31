@@ -71,7 +71,6 @@ def get_user_creds():
 if __name__ == "__main__":
     argc = len(sys.argv)
     if argc > 1:
-        spl_err_msg = False
 
         if os.path.exists(sys.argv[1]):
             with open(sys.argv[1], "r") as f:
@@ -80,19 +79,16 @@ if __name__ == "__main__":
         else:
             user_ids = sys.argv[1:]
             if argc == 2:
-                spl_err_msg = True
+                print(f"Error: No file found with path {sys.argv[1]}, treating it as rollno.", file=sys.stderr)
 
         for user_id in user_ids:
             BODY["UserID"] = user_id
             
             if (creds := get_user_pwd()) is None:
-                if spl_err_msg:
-                    print(f"No file or rollno. found that matches \"{user_id}\"", file=sys.stderr)
-                else:
-                    print(f"No student found with rollno. {user_id}", file=sys.stderr)
+                print(f"Error: No student found with rollno. {user_id}", file=sys.stderr)
 
             elif creds[0] is None:
-                print(f"No password found for {user_id}, try increasing max_offset in guess_user_yob", file=sys.stderr)
+                print(f"Error: No password found for {user_id}, try increasing max_offset in guess_user_yob", file=sys.stderr)
 
             else:
                 print(*creds, sep=",")

@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-import requests as req
+from requests import Session
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler as Scheduler
 
@@ -80,6 +80,9 @@ def check_and_mark(webIdentifier, name):
 
         
 def main():
+    global req
+    req = Session()
+    
     print(datetime.now())
 
     if config := load_config():
