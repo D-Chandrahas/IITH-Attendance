@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from requests import Session
@@ -15,13 +14,13 @@ MARK_ATTENDANCE_PATH = "UpSertStudentAttendanceDetails"
 if len(sys.argv) > 1:
     CONFIG_PATH = sys.argv[1]
 else:
-    CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+    CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.txt")
 
 
 def load_config():
     if os.path.exists(CONFIG_PATH):
         with open(CONFIG_PATH, "r") as f:
-            return json.load(f)
+            return f.read().splitlines()
     else:
         return None
 
@@ -86,8 +85,9 @@ def main():
     print(datetime.now())
 
     if config := load_config():
-        print(f"Config loaded\n")
-        check_and_mark(config["WebIdentifier"], config["Name"])
+        print(f"Config loaded, found {len(config)} entries.\n")
+        for entry in config:
+            check_and_mark( *map(str.strip, entry.split(",")[:2]) )
     else:
         print(f"No config found at {os.path.abspath(CONFIG_PATH)}")
 
