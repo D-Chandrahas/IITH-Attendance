@@ -69,10 +69,12 @@ def get_user_creds():
 
 
 def print_help():
-    print("\nUsage:\n    python scraper.py [-h | --help]; Display this help page", file=sys.stderr)
+    print("\nUsage: (do not include brackets)\n    python scraper.py [-h | --help]; Display this help page", file=sys.stderr)
     print("    python scraper.py [rollno1] [rollno2] ...", file=sys.stderr)
-    print("    python scraper.py [file_path]\n", file=sys.stderr)
+    print("    python scraper.py [file_path]", file=sys.stderr)
+    print("    python scraper.py; Scrape all btech students' credentials\n\n", file=sys.stderr)
     print("Input file format:\nrollno1\nrollno2\n...\n", file=sys.stderr)
+    print("Output format:\nWebID1,Name1,rollno1,password1\nWebID2,Name2,rollno2,password2\n...\n", file=sys.stderr)
 
 
 if __name__ == "__main__":

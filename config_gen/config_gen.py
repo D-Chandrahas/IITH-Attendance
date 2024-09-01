@@ -33,10 +33,11 @@ def login_req():
 
 
 def print_help():
-    print("\nUsage:\n    python config_gen.py [-h | --help]; Display this help page", file=sys.stderr)
+    print("\nUsage: (do not include brackets)\n    python config_gen.py [-h | --help]; Display this help page", file=sys.stderr)
     print("    python config_gen.py [rollno1,password1] [rollno2,password2] ...", file=sys.stderr)
-    print("    python config_gen.py [file_path]\n", file=sys.stderr)
+    print("    python config_gen.py [file_path]\n\n", file=sys.stderr)
     print("Input file format:\nrollno1,password1\nrollno2,password2\n...\n", file=sys.stderr)
+    print("Output format:\nWebID1,Name1,rollno1,password1\nWebID2,Name2,rollno2,password2\n...\n", file=sys.stderr)
     
     
 if __name__ == "__main__":
