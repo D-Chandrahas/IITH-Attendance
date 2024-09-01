@@ -96,13 +96,13 @@ def main():
 
 def start_scheduler():
     scheduler = Scheduler()
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour= 9, minute=40, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=10, minute=40, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=11, minute=40, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=12, minute=40, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=15, minute=40, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=17, minute=10, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=18, minute=40, misfire_grace_time = 120)
+    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour= 9, minute=10, misfire_grace_time = 120)
+    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=10, minute=10, misfire_grace_time = 120)
+    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=11, minute=10, misfire_grace_time = 120)
+    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=12, minute=10, misfire_grace_time = 120)
+    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=14, minute=40, misfire_grace_time = 120)
+    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=16, minute=10, misfire_grace_time = 120)
+    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=17, minute=40, misfire_grace_time = 120)
     print(datetime.now(), "Scheduler started", f"Config path: {os.path.abspath(CONFIG_PATH)}", "=" * 50, "\n", sep="\n")
     scheduler.start()
     
