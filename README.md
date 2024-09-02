@@ -1,3 +1,8 @@
+### If you are interested in automating the process of marking attendance, check out [auto-attendance](./auto_attendance/).
+### If you are interested in scraping/brute-forcing credentials/passwords, check out [scraper](./scraper/).
+
+---
+
 ### This is a simple alternative for the iith attandance app. It uses the same api endpoint as the official app. *
 \* I am **not** responsible for any consequences of using this script. Use at your own risk.
 

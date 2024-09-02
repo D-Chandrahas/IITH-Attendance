@@ -5,13 +5,15 @@
 - Scraping all credentials can be done by running the script with no arguments.
     - List of departments and batches to scrape can be changed by editing the lists at the end of the script.
 - Output is printed to `stdout`, saving it to a file can be done by redirecting the output.
-    - Ex: `python scraper.py [args] > output.txt`, refer to your shell's docs for more info.
+    - Ex: `python -u scraper.py [args] > output.txt`; `-u` for unbuffered output
+        - refer to your shell's docs for more info about output redirection.
     - Any errors are printed to `stderr`.
 - The output is csv formatted with the following columns:
     - `Unique Web ID, Name, Roll Number, Password(DOB)`
-        - *Note:* This is the same format as the config file for the [auto_attendance.py](../auto_attendance/auto_attendance.py) script.
-
-### Usage: 
+        - *Note:* This is the same format as the config file for the [auto_attendance.py](../auto_attendance/) script.
+---
+### Usage:
+Requires `requests` module. Install with `pip install requests` if not already installed.
 ```
     python scraper.py [-h | --help]; Display this help page
     python scraper.py [rollno1] [rollno2] ...
@@ -32,3 +34,4 @@ WebID1,Name1,rollno1,password1
 WebID2,Name2,rollno2,password2
 ...
 ```
+### Note: Tested on Python 3.10, 3.11
