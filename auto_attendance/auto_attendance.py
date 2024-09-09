@@ -64,7 +64,7 @@ def check_and_mark(webIdentifier, name):
     success1, data = timetable_req(webIdentifier)
 
     if not success1:
-        print("\nUnable to fetch timetable.", "\n\nError:", data)
+        print("\nUnable to fetch timetable for", name, "\nError:", data)
     else:
         for course in data:
             if course["classGroup"] == "Ongoing" and not course["attendanceMarked"]:
@@ -72,7 +72,7 @@ def check_and_mark(webIdentifier, name):
                 if success2:
                     print(f"Attendance marked for {name} for {course['courseCode']}.")
                 else:
-                    print(f"Error: {err_msg}\n")
+                    print("Unable to mark attendance for", name, "\nError:", err_msg)
                 break
         else: # no break
             print(f"No attendance to mark for {name}.")
