@@ -18,6 +18,10 @@ else:
     CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.txt")
 
 
+class AttendanceError(Exception):
+    pass
+
+
 def load_config():
     if os.path.exists(CONFIG_PATH):
         with open(CONFIG_PATH, "r") as f:
@@ -76,6 +80,7 @@ def check_and_mark(webIdentifier, name):
 
     if not success1:
         print("\nUnable to fetch timetable for", name, "\nError:", data)
+        raise AttendanceError
     else:
         for course in data:
             if course["classGroup"] == "Ongoing":
@@ -85,15 +90,18 @@ def check_and_mark(webIdentifier, name):
                         print(f"Attendance marked for {name} for {course['courseCode']}.")
                     else:
                         print("Unable to mark attendance for", name, "\nError:", err_msg)
+                        raise AttendanceError
                 else:
                     print(f"Attendance already marked for {name} for {course['courseCode']}.")
                 break
         else: # no break
             print(f"No attendance to mark for {name}.")
 
-        
+
+retries = None
+
 def main():
-    global req
+    global req, retries
     req = Session()
     
     print(datetime.now())
@@ -101,7 +109,33 @@ def main():
     if config := load_config():
         print(f"Config loaded, found {len(config)} entries.\n")
         for entry in config:
-            check_and_mark( *map(str.strip, entry.split(",")[:2]) )
+            for i in range(3):
+                try:
+                    check_and_mark( *map(str.strip, entry.split(",")[:2]) )
+                except AttendanceError:
+                    if i == 2:
+                        
+                        print("\n\nTerminating current run.", end=" ")
+
+                        if retries is None:
+                            scheduler.add_job(main, "interval", minutes=10, misfire_grace_time = 60, id="retry")
+                            retries = 0
+                            print("Retrying in 10 minutes.")
+                        elif retries >= 1:
+                            scheduler.remove_job("retry")
+                            retries = None
+                            print("Max retries reached.")
+                        else:
+                            retries += 1
+                            print("Retrying in 10 minutes.")
+
+                        print(f"{'-'*50}\n")
+                        return
+                    
+                    else:
+                        sleep(60)
+                else:
+                    break
     else:
         print(f"No config found at {os.path.abspath(CONFIG_PATH)}")
 
@@ -109,6 +143,7 @@ def main():
 
 
 def start_scheduler():
+    global scheduler
     scheduler = Scheduler()
     scheduler.add_job(main, "cron", day_of_week="mon-fri", hour= 9, minute=10, misfire_grace_time = 120)
     scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=10, minute=10, misfire_grace_time = 120)
