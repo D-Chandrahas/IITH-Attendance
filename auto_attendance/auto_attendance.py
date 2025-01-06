@@ -1,5 +1,6 @@
 import os
 import sys
+from time import sleep
 from requests import Session
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler as Scheduler
@@ -28,10 +29,15 @@ def load_config():
 def timetable_req(webIdentifier):
     body = { "WebIdentifier": webIdentifier }
 
-    try:
-        res = req.post(BASE_URL + TIMETABLE_PATH, json=body)
-    except Exception as e:
-        return False, f"{e}\nProbably a server-side error, IDK\n"
+    for i in range(3):
+        try:
+            res = req.post(BASE_URL + TIMETABLE_PATH, json=body)
+        except Exception as e:
+            if i == 2:
+                return False, f"{e}\nProbably a server-side error, IDK\n"
+            sleep(10)
+        else:
+            break
     
     if res.status_code == 200:
         return True, res.json()["table"]
@@ -45,10 +51,15 @@ def mark_attendance_req(webIdentifier, timeTableId):
         "TimeTableId": timeTableId
     }
 
-    try:
-        res = req.post(BASE_URL + MARK_ATTENDANCE_PATH, json=body)
-    except Exception as e:
-        return False, f"{e}\nProbably a server-side error, IDK\n"
+    for i in range(3):
+        try:
+            res = req.post(BASE_URL + MARK_ATTENDANCE_PATH, json=body)
+        except Exception as e:
+            if i == 2:
+                return False, f"{e}\nProbably a server-side error, IDK\n"
+            sleep(10)
+        else:
+            break
     
     if res.status_code == 200:
         data = res.json()["table"][0]
@@ -67,12 +78,15 @@ def check_and_mark(webIdentifier, name):
         print("\nUnable to fetch timetable for", name, "\nError:", data)
     else:
         for course in data:
-            if course["classGroup"] == "Ongoing" and not course["attendanceMarked"]:
-                success2, err_msg = mark_attendance_req(webIdentifier, course["timeTableId"])
-                if success2:
-                    print(f"Attendance marked for {name} for {course['courseCode']}.")
+            if course["classGroup"] == "Ongoing":
+                if not course["attendanceMarked"]:
+                    success2, err_msg = mark_attendance_req(webIdentifier, course["timeTableId"])
+                    if success2:
+                        print(f"Attendance marked for {name} for {course['courseCode']}.")
+                    else:
+                        print("Unable to mark attendance for", name, "\nError:", err_msg)
                 else:
-                    print("Unable to mark attendance for", name, "\nError:", err_msg)
+                    print(f"Attendance already marked for {name} for {course['courseCode']}.")
                 break
         else: # no break
             print(f"No attendance to mark for {name}.")
