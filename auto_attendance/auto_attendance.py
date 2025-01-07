@@ -7,9 +7,23 @@ from apscheduler.schedulers.blocking import BlockingScheduler as Scheduler
 
 BASE_URL = "https://erp.iith.ac.in/MobileAPI/"
 
-
 TIMETABLE_PATH = "GetStudentTimeTableForAttendance"
 MARK_ATTENDANCE_PATH = "UpSertStudentAttendanceDetails"
+
+# (hour, minute)
+JOBS = ((9, 10),
+        (10, 10),
+        (11, 10),
+        (12, 10),
+        (14, 40),
+        (16, 10),
+        (17, 40))
+
+
+TIMETABLE_MAX_TRIES = 3; TIMETABLE_RETRY_DELAY = 10 # seconds
+MARK_ATTEN_MAX_TRIES = 3; MARK_ATTEN_RETRY_DELAY = 10 # seconds
+ATTEN_ERR_MAX_TRIES = 3; ATTEN_ERR_RETRY_DELAY = 60 # seconds
+RETRY_JOB_MAX_RUNS = 3; RETRY_JOB_INTERVAL = 10 # minutes
 
 
 if len(sys.argv) > 1:
@@ -33,13 +47,14 @@ def load_config():
 def timetable_req(webIdentifier):
     body = { "WebIdentifier": webIdentifier }
 
-    for i in range(3):
+    for i in range(TIMETABLE_MAX_TRIES):
         try:
             res = req.post(BASE_URL + TIMETABLE_PATH, json=body)
         except Exception as e:
-            if i == 2:
+            if i == TIMETABLE_MAX_TRIES - 1:
                 return False, f"{e}\nProbably a server-side error, IDK\n"
-            sleep(10)
+            else:
+                sleep(TIMETABLE_RETRY_DELAY)
         else:
             break
     
@@ -55,13 +70,14 @@ def mark_attendance_req(webIdentifier, timeTableId):
         "TimeTableId": timeTableId
     }
 
-    for i in range(3):
+    for i in range(MARK_ATTEN_MAX_TRIES):
         try:
             res = req.post(BASE_URL + MARK_ATTENDANCE_PATH, json=body)
         except Exception as e:
-            if i == 2:
+            if i == MARK_ATTEN_MAX_TRIES - 1:
                 return False, f"{e}\nProbably a server-side error, IDK\n"
-            sleep(10)
+            else:
+                sleep(MARK_ATTEN_RETRY_DELAY)
         else:
             break
     
@@ -98,10 +114,10 @@ def check_and_mark(webIdentifier, name):
             print(f"No attendance to mark for {name}.")
 
 
-retries = None
+RETRY_COUNT = None
 
 def main():
-    global req, retries
+    global req, RETRY_COUNT
     req = Session()
     
     print(datetime.now())
@@ -109,32 +125,34 @@ def main():
     if config := load_config():
         print(f"Config loaded, found {len(config)} entries.\n")
         for entry in config:
-            for i in range(3):
+            for i in range(ATTEN_ERR_MAX_TRIES):
                 try:
                     check_and_mark( *map(str.strip, entry.split(",")[:2]) )
                 except AttendanceError:
-                    if i == 2:
+                    if i == ATTEN_ERR_MAX_TRIES - 1:
                         
                         print("\n\nTerminating current run.", end=" ")
 
-                        if retries is None:
-                            scheduler.add_job(main, "interval", minutes=10, misfire_grace_time = 60, id="retry")
-                            retries = 0
+                        if RETRY_COUNT is None:
+                            SCHEDULER.add_job(main, "interval", minutes=RETRY_JOB_INTERVAL, misfire_grace_time = 60, id="retry")
+                            RETRY_COUNT = 0
                             print("Retrying in 10 minutes.")
-                        elif retries >= 1:
-                            scheduler.remove_job("retry")
-                            retries = None
+                        elif (RETRY_COUNT := RETRY_COUNT + 1) >= RETRY_JOB_MAX_RUNS:
+                            SCHEDULER.remove_job("retry")
+                            RETRY_COUNT = None
                             print("Max retries reached.")
                         else:
-                            retries += 1
                             print("Retrying in 10 minutes.")
 
                         print(f"{'-'*50}\n")
                         return
                     
                     else:
-                        sleep(60)
+                        sleep(ATTEN_ERR_RETRY_DELAY)
                 else:
+                    if RETRY_COUNT is not None:
+                        SCHEDULER.remove_job("retry")
+                        RETRY_COUNT = None
                     break
     else:
         print(f"No config found at {os.path.abspath(CONFIG_PATH)}")
@@ -143,17 +161,12 @@ def main():
 
 
 def start_scheduler():
-    global scheduler
-    scheduler = Scheduler()
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour= 9, minute=10, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=10, minute=10, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=11, minute=10, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=12, minute=10, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=14, minute=40, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=16, minute=10, misfire_grace_time = 120)
-    scheduler.add_job(main, "cron", day_of_week="mon-fri", hour=17, minute=40, misfire_grace_time = 120)
+    global SCHEDULER
+    SCHEDULER = Scheduler()
+    for job in JOBS:
+        SCHEDULER.add_job(main, "cron", day_of_week="mon-fri", hour=job[0], minute=job[1], misfire_grace_time = 120)
     print(datetime.now(), "Scheduler started", f"Config path: {os.path.abspath(CONFIG_PATH)}", "=" * 50, "\n", sep="\n")
-    scheduler.start()
+    SCHEDULER.start()
     
 
 if __name__ == "__main__":
